@@ -60,10 +60,10 @@ function loadProjects(u) {
         async: false,
         success: function(data)
         {
-   			var $projects = $(data).find("span.title").children();
-    		for (var p = 0; p < $projects.length; p++) {
-        	var id = $projects[p].pathname.match(/\d+/)[0];
-			loadStudios(id);
+   		var $projects = $(data).find("span.title").children();
+   		for (var p = 0; p < $projects.length; p++) {
+   			var id = $projects[p].pathname.match(/\d+/)[0];
+   			loadStudios(id);
     	}
     	_n++;
     	loadProjects(u);
@@ -82,12 +82,12 @@ function loadStudios(p) {
         async: false,
         success: function(data)
         {
-			var $s = [];
-    		var $studios = $(data).find("span.title").children();
+        	var $s = [];
+        	var $studios = $(data).find("span.title").children();
     		for (var s = 0; s < $studios.length; s++) {
-				var name = $studios[s].text.trim();
-        		var id = $studios[s].pathname.match(/\d+/)[0];
-        		if (AE.test(name)) $s.push(id);
+    			var name = $studios[s].text.trim();
+    			var id = $studios[s].pathname.match(/\d+/)[0];
+    			if (AE.test(name)) $s.push(id);
     		}
 			if ($s.length) _d.push({p:p,s:$s});
 		},
