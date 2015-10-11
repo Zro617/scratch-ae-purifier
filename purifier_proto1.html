@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<head>
+	<h2>Zro716's Project Purifier</h2>
+	<p>
+	A fast and easy way to remove every AE studio on all your projects. Simply enter your username and password and click Purify.
+	Your password is needed only for cross-site authentification and will be discarded from memory upon completion.
+	</p>
+	<b style="color:#F00">Warning: this program uses synchronous AJAX requests to load data. This webpage may be unresponsive for a while.</b>
+	<p>Username:</p><input type=textbox id="username" value=""></input><br>
+	<p>Password:</p><input type=password id="password" value=""></input><br>
+	<br>
+	<button id="purify">Purify</button>
+	<p id="message"></p>
+	<ul id="output">
+	</ul>
+</head>
+
+<script id="jquery" src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+<script id="mainjs">
+var AE = /ae |follow|add (any|every)(one|thing|body)|\d+ (projects|managers|curators|followers)|can we|(get|gimme|give me) .* (before|by)|(as|how) (many|much)|\d{9,}/gi;
+var _n,_pc,_sc;
+var _u={name:"",pass:""},
+	_p={name:"",id:0},
+    _s={name:"",id:0};
+
+var $o;
+
+function purify() {
+    _u.name = $("#username")[0].value;
+    _u.pass = $("#password")[0].value;
+    if (_u.name && _u.pass) {
+		_n=1,_pc=0,_sc=0;
+		$("#output").empty();
+        $("#message")[0].innerHTML = "Purifying projects. Please wait...";
+        loadProjects();
+        $("#message")[0].innerHTML = "Purification complete.\n"+_pc+" projects purified and "+_sc+" studios removed.";
+		$("#username")[0].value = "";
+		$("#password")[0].value = "";
+    } else {
+        $("#message")[0].innerHTML = "Please enter your username and password.";
+    }
+	_u.name = "";
+	_u.pass = "";
+}
+
+function loadProjects() {
+    $.ajax({type: "GET",
+            url: "https://scratch.mit.edu/users/"+_u.name+"/projects/?page="+_n,
+            async: false,
+            success: function(data)
+            {
+    			var $projects = $(data).find("span.title").children();
+    			for (var p = 0; p < $projects.length; p++) {
+        			_p.name = $projects[p].text.trim();
+        			_p.id = $projects[p].pathname.match(/\d+/)[0];
+					$o = '<li><a href="https://scratch.mit.edu/projects/'+_p.id+'">'+_p.name+'</a>';
+					loadStudios();
+					$o += '</li>';
+					$("#output").append($o);
+        			_pc++;
+    			}
+    			_n++;
+    			loadProjects();
+			},
+            error: function(errorThrown)
+            {
+                $("#message")[0].innerHTML = "Cannot load projects. Error: "+errorThrown;
+            }
+     });
+}
+
+function loadStudios() {
+    $.ajax({
+    	type: "GET",
+        url: "https://scratch.mit.edu/projects/"+_p.id+"/studios/",
+        async: false,
+        success: function(data)
+        {
+			var $s = '';
+    		var $studios = $(data).find("span.title").children();
+    		for (var s = 0; s < $studios.length; s++) {
+        		_s.name = $studios[s].text.trim();
+        		_s.id = $studios[s].pathname.match(/\d+/)[0];
+        		if (AE.test(_s.name)) {
+					$s += '<li>'+_s.name+'</li>';
+                    removeStudio();
+            		_sc++;
+        		}
+    		}
+			if($s){$o+='<ul>'+$s+'</ul>';}
+		},
+        error: function(errorThrown)
+        {
+            $("#message")[0].innerHTML = "Cannot load studios. Error: "+errorThrown;
+        }
+    });
+}
+
+// this API was found somewhere in the backbone code in Scratch
+function removeStudio() {
+    $.ajax({
+        type: "PUT",
+        url: "https://scratch.mit.edu/site-api/projects/in/"+_s.id+"/remove/?pks="+_p.id,
+        async: false,
+        username: _u.name,
+        password: _u.pass,
+        success: function() { console.log("Successful removal of studio "+JSON.stringify(_s)+" from project "+JSON.stringify(_p)); },
+        error: function(xhr) { console.log("Removal failed. XHR: "+JSON.stringify(xhr)); }
+	});
+}
+$("#purify")[0].addEventListener('click',purify); // for jsfiddle
+</script>
