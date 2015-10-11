@@ -97,7 +97,7 @@ function loadStudios(p) {
 }
 
 function generateCode() {
-    $("#output")[0].value = 'var j=' + JSON.stringify(_d) + ';\nfor(var k in j)for(var s in j[k].s)$.ajax({type:"PUT",url:"https://scratch.mit.edu/site-api/projects/in/"+j[k].s[s]+"/remove/?pks="+j[k].p,async:false,success:function(){console.log("Successful removal of studio "+j[k].s[s]+" from project "+j[k].p);},error:function(xhr){console.log("Removal failed. "+JSON.stringify(xhr));}});';
+    $("#output")[0].value = 'var j=' + JSON.stringify(_d) + ';\nfor(var k in j)for(var s in j[k].s)$.ajax({type:"PUT",url:"https://scratch.mit.edu/site-api/projects/in/"+j[k].s[s]+"/remove/?pks="+j[k].p,async:false,success:function(){console.log("SUCCESS");},error:function(xhr){console.log("FAILED");}});console.log("DONE");';
 }
 
 $("#purify")[0].addEventListener('click', purify);
