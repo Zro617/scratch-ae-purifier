@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<head>
+	<h2>Zro716's Project Purifier</h2>
+	<p>
+	A fast and easy way to rid all your projects of AE studios and similar spam.
+	Enter your username to have the program extract your projects and associated studios. No password needed!
+	</p>
+	<b style="color:#F00">Warning: this program uses synchronous AJAX requests to load data. This webpage may be unresponsive for a while.</b>
+	<p>Username:</p><input type=textbox id="username" value=""></input><br>
+	<br>
+	<button id="purify">Get data</button>
+	<p id="message"></p>
+	<textarea id="output" value="" rows="15" cols="80" style="display:none;"></textarea>
+</head>
+
+<script id="jquery" src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+<script id="mainjs">
+var AE = /ae |follow|add (any|every)(one|thing|body)|\d+ (projects|managers|curators|followers)|can we|(get|gimme|give me) .* (before|by)|(as|how) (many|much)|\d{9,}/gi;
+var _n,
+	_u="",
+	_v=false,
+	_d=[];
+	
+function purify() {
+    _u = $("#username")[0].value;
+    if (_u) {
+		checkUser(_u);
+		if(_v) {
+			_n=1;
+			$("#output")[0].style="display:none;";
+			$("#message")[0].innerHTML = "Gathering data. Please wait...";
+			loadProjects(_u);
+			if (_d.length) {
+				generateCode();
+				$("#message")[0].innerHTML = "1. Copy the following code to your clipboard.<br>2. Login to scratch.mit.edu as "+_u+"<br>3. Paste the code into your browser's console and run.";
+				$("#output")[0].style="display:block;";
+			} else {
+				$("#message")[0].innerHTML = "Looks like all your projects are free of AE studios! :D"
+			}
+		} else {
+			$("#message")[0].innerHTML = "Lol, don't try me. Please enter your REAL username.";
+		}
+    } else {
+        $("#message")[0].innerHTML = "Please enter your username.";
+    }
+	_u="";
+}
+
+function checkUser(u) {
+	$.ajax({type: "GET",
+			url: "https://scratch.mit.edu/users/"+u+"/",
+			async: false,
+			success: function() { _v=true; },
+			error: function() { _v=false; }
+			});
+}
+
+function loadProjects(u) {
+    $.ajax({type: "GET",
+            url: "https://scratch.mit.edu/users/"+u+"/projects/?page="+_n,
+            async: false,
+            success: function(data)
+            {
+    			var $projects = $(data).find("span.title").children();
+    			for (var p = 0; p < $projects.length; p++) {
+        			var id = $projects[p].pathname.match(/\d+/)[0];
+					loadStudios(id);
+    			}
+    			_n++;
+    			loadProjects(u);
+			},
+            error: function(errorThrown)
+            {
+                $("#message")[0].innerHTML = "Cannot load projects. Error: "+errorThrown;
+            }
+     });
+}
+
+function loadStudios(p) {
+    $.ajax({
+    	type: "GET",
+        url: "https://scratch.mit.edu/projects/"+p+"/studios/",
+        async: false,
+        success: function(data)
+        {
+			var $s = [];
+    		var $studios = $(data).find("span.title").children();
+    		for (var s = 0; s < $studios.length; s++) {
+				var name = $studios[s].text.trim();
+        		var id = $studios[s].pathname.match(/\d+/)[0];
+        		if (AE.test(name)) $s.push(id);
+    		}
+			if ($s.length) _d.push({p:p,s:$s});
+		},
+        error: function(errorThrown)
+        {
+            $("#message")[0].innerHTML = "Cannot load studios. Error: "+errorThrown;
+        }
+    });
+}
+
+function generateCode() {
+	$("#output")[0].value = 'var j='+JSON.stringify(_d)+';\nfor(var k in j)for(var s in j[k].s)$.ajax({type:"PUT",url:"https://scratch.mit.edu/site-api/projects/in/"+j[k].s[s]+"/remove/?pks="+j[k].p,async:false,success:function(){console.log("Successful removal of studio "+j[k].s[s]+" from project "+j[k].p);},error:function(xhr){console.log("Removal failed. "+JSON.stringify(xhr));}});';
+}
+
+$("#purify")[0].addEventListener('click',purify);
+</script>
