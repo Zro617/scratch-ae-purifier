@@ -1,23 +1,30 @@
 <!DOCTYPE html>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<head>
-	<h2>Zro716's Project Purifier</h2>
-	<p>
-	A fast and easy way to rid all your projects of AE studios and similar spam.
-	Enter your username to have the program extract your projects and associated studios. No password needed!
-	</p>
-	<b style="color:#F00">Warning: this program uses synchronous AJAX requests to load data. This webpage may be unresponsive for a while.</b>
-	<p>Username:</p><input type=textbox id="username" value=""></input><br>
-	<br>
-	<button id="purify">Get data</button>
-	<p id="message"></p>
-	<textarea id="output" value="" rows="15" cols="80" style="display:none;"></textarea>
-</head>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+		<h2>Zro716's Project Purifier</h2>
+		<p>A fast and easy way to rid all your projects of AE studios and similar spam.
+		Enter your username to have the program extract your projects and associated studios. No password needed!
+		</p>
+		<b style="color:#F00">Warning: this program uses synchronous AJAX requests to load data. This webpage may be unresponsive for a while.</b>
+		<p>Username:</p>
+		<input type=textbox id="username" value=""></input><br>
+		<br>
+		<p>Need something else filtered? Enter your regular expression here (no /'s, treated as case-insensitive):</p>
+		<textarea id="extra-regex" value="" rows="2" cols="80" style="display:block;" placeholder="fan ?(club|base)|fnaf|random"></textarea>
+		<button id="purify">Get data</button>
+		<p id="message"></p>
+		<textarea id="output" value="" rows="15" cols="80" style="display:none;"></textarea>
+	</body>
+	<script id="jquery" src="http://code.jquery.com/jquery-latest.min.js"></script>
 
-<script id="jquery" src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script id="mainjs">
+var notAE = /only|quality|good|awesome|fantastic|great|amazing|test|science|math|programming|computer|tech|info|advice/gi; // this was added to prevent false alarms
+var AE = /\Wae\W|(add ){2,}|(as|how) (many|much)|((add|get(to )?|reach|need|feed (me|us|this( studio)?)) )?(\d+|every|any|all)((thing| projects?)|(body|one)( (a|i)s a (manager|curator)))?/gi; // it may not get every AE studio but it's sufficient enough
+var extras;
 
-<script id="mainjs">
-var AE = /ae |follow|add (any|every)(one|thing|body)|\d+ (projects|managers|curators|followers)|can we|(get|gimme|give me) .* (before|by)|(as|how) (many|much)|\d{9,}/gi;
 var _n, _u = "", _v = false, _d = [];
 
 function purify() {
@@ -55,6 +62,15 @@ function checkUser(u) {
     });
 }
 
+function getCustomRegex() {
+	try {
+		extras = new Regex($("#extra-regex")[0].value,'gi');
+	} catch (e) {
+		console.log("Not a valid regex.");
+		extras = "";
+	}
+}
+
 function loadProjects(u) {
     $.ajax({
         type: "GET",
@@ -86,7 +102,9 @@ function loadStudios(p) {
             for (var s = 0; s < $studios.length; s++) {
                 var name = $studios[s].text.trim();
                 var id = $studios[s].pathname.match(/\d+/)[0];
-                if (AE.test(name)) $s.push(id);
+                if (AE.test(name) && !notAE.test(name)) $s.push(id);
+                else if (extras && extras.test(name)) $s.push(id);
+                
             }
             if ($s.length) _d.push({p: p,s: $s});
         },
@@ -101,4 +119,5 @@ function generateCode() {
 }
 
 $("#purify")[0].addEventListener('click', purify);
-</script>
+	</script>
+</html>
