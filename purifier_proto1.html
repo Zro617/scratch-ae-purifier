@@ -114,10 +114,14 @@ function loadStudios() {
             for (var s = 0; s < $studios.length; s++) {
                 _s.name = $studios[s].text.trim();
                 _s.id = $studios[s].pathname.match(/\d+/)[0];
-                if (AE.test(_s.name)) {
+                if (AE.test(_s.name) && !notAE.test(_s.name)) {
                     $s += '<li>' + _s.name + '</li>';
                     removeStudio();
                     _sc++;
+                } else if (extras && extras.test(_s.name)) {
+                	$s += '<li>' +_s.name + ' [custom filter]</li>';
+                	removeStudio();
+                	_sc++;
                 }
             }
             if ($s) { $o += '<ul>' + $s + '</ul>'; }
