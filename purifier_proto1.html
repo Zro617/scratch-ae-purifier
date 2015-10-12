@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<head>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
 	<h2>Zro716's Project Purifier</h2>
 	<p>
 	A fast and easy way to remove every AE studio on all your projects. Simply enter your username and password and click Purify.
@@ -9,18 +12,23 @@
 	<b style="color:#F00">Warning: this program uses synchronous AJAX requests to load data. This webpage may be unresponsive for a while.</b>
 	<p>Username:</p><input type=textbox id="username" value=""></input><br>
 	<p>Password:</p><input type=password id="password" value=""></input><br>
+	<p>Need something else filtered? Enter your custom regular expression here:</p>
+	<textarea id="extra-regex" value="" rows="2" cols="80" style="display:block;" placeholder="fan ?(club|base)|fnaf|random"></textarea>
 	<br>
 	<button id="purify">Purify</button>
 	<p id="message"></p>
 	<ul id="output">
-	</ul>
-</head>
+	</ul>	
+	</body>
 
 <script id="jquery" src="http://code.jquery.com/jquery-latest.min.js"></script>
 
 <script id="mainjs">
-var AE = /ae |follow|add (any|every)(one|thing|body)|\d+ (projects|managers|curators|followers)|can we|(get|gimme|give me) .* (before|by)|(as|how) (many|much)|\d{9,}/gi;
-var _n, _pc, _sc;
+var notAE = /only|quality|good|awesome|fantastic|great|amazing|test|science|math|programming|computer|tech|info|advice/gi; // this was added to prevent false alarms
+var AE = /\Wae\W|(add ){2,}|(as|how) (many|much)|((add|get(to )?|reach|need|feed (me|us|this( studio)?)) )?(\d+|every|any|all)((thing| projects?)|(body|one)( (a|i)s a (manager|curator)))?/gi; // it may not get every AE studio but it's sufficient enough
+var extras;
+
+var _n, _pc, _sc, _v = false;
 var _u = { name: "", pass: "" },
     _p = { name: "", id: 0 },
     _s = { name: "", id: 0 };
@@ -31,18 +39,43 @@ function purify() {
     _u.name = $("#username")[0].value;
     _u.pass = $("#password")[0].value;
     if (_u.name && _u.pass) {
-        _n = 1, _pc = 0, _sc = 0;
-        $("#output").empty();
-        $("#message")[0].innerHTML = "Purifying projects. Please wait...";
-        loadProjects();
-        $("#message")[0].innerHTML = "Purification complete.\n" + _pc + " projects purified and " + _sc + " studios removed.";
-        $("#username")[0].value = "";
-        $("#password")[0].value = "";
+    	checkUser(_u.name);
+    	if (_v) {
+    		_n = 1, _pc = 0, _sc = 0;
+        	$("#output").empty();
+        	$("#message")[0].innerHTML = "Purifying projects. Please wait...";
+        	getCustomRegex();
+        	loadProjects();
+        	$("#message")[0].innerHTML = "Purification complete.\n" + _pc + " projects purified and " + _sc + " studios removed.";
+        	$("#username")[0].value = "";
+        	$("#password")[0].value = "";	
+    	} else {
+    		$("#message")[0].innerHMTL = "Lol, don't try me. Please enter your REAL username.";
+    	}
     } else {
         $("#message")[0].innerHTML = "Please enter your username and password.";
     }
     _u.name = "";
     _u.pass = "";
+}
+
+function checkUser(u) {
+	$.ajax({
+		type: "GET",
+		url: "https://scratch.mit.edu/users/"+u+"/",
+		async: false,
+		success: function() { _v = true; },
+		error: function() { _v = false; }
+	})
+}
+
+function getCustomRegex() {
+	try {
+		extras = new Regex($("#extra-regex")[0].value,'gi');
+	} catch (e) {
+		console.log("Not a valid regex.");
+		extras = "";
+	}
 }
 
 function loadProjects() {
@@ -113,3 +146,6 @@ function removeStudio() {
 }
 $("#purify")[0].addEventListener('click', purify);
 </script>
+</html>
+
+
