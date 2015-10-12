@@ -66,7 +66,7 @@ function getCustomRegex() {
 	try {
 		extras = new Regex($("#extra-regex")[0].value,'gi');
 	} catch (e) {
-		console.log("Not a valid regex.");
+		console.log("Not a valid regex. " + e);
 		extras = "";
 	}
 }
