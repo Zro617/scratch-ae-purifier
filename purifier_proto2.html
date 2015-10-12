@@ -35,6 +35,7 @@ function purify() {
             _n = 1;
             $("#output")[0].style = "display:none;";
             $("#message")[0].innerHTML = "Gathering data. Please wait...";
+            getCustomRegex();
             loadProjects(_u);
             if (_d.length) {
                 generateCode();
