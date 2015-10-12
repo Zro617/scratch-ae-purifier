@@ -37,6 +37,7 @@ var _u = { name: "", pass: "" },
 var $o;
 
 function purify() {
+    getCustomRegExp();
     _u.name = $("#username")[0].value;
     _u.pass = $("#password")[0].value;
     if (_u.name && _u.pass) {
@@ -45,7 +46,6 @@ function purify() {
     		_n = 1, _pc = 0, _sc = 0;
         	$("#output").empty();
         	$("#message")[0].innerHTML = "Purifying projects. Please wait...";
-        	getCustomRegex();
         	loadProjects();
         	$("#message")[0].innerHTML = "Purification complete.\n" + _pc + " projects purified and " + _sc + " studios removed.";
         	$("#username")[0].value = "";
@@ -70,9 +70,9 @@ function checkUser(u) {
 	})
 }
 
-function getCustomRegex() {
+function getCustomRegExp() {
 	try {
-		extras = new Regex($("#extra-regex")[0].value,'gi');
+		extras = new RegExp($("#extra-regex")[0].value,'gi');
 	} catch (e) {
 		console.log("Not a valid regex. " + e);
 		extras = "";
