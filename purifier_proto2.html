@@ -27,6 +27,7 @@ var extras; // custom regex
 var _n, _u = "", _v = false, _d = [];
 
 function purify() {
+    getCustomRegExp();
     _u = $("#username")[0].value;
     if (_u) {
         checkUser(_u);
@@ -34,7 +35,6 @@ function purify() {
             _n = 1;
             $("#output")[0].style = "display:none;";
             $("#message")[0].innerHTML = "Gathering data. Please wait...";
-            getCustomRegex();
             loadProjects(_u);
             if (_d.length) {
                 generateCode();
@@ -62,9 +62,9 @@ function checkUser(u) {
     });
 }
 
-function getCustomRegex() {
+function getCustomRegExp() {
 	try {
-		extras = new Regex($("#extra-regex")[0].value,'gi');
+		extras = new RegExp($("#extra-regex")[0].value,'gi');
 	} catch (e) {
 		console.log("Not a valid regex. " + e);
 		extras = "";
