@@ -6,8 +6,9 @@ One of the most common nuisances on Scratch are these studios that try to gobble
 
 But all of that is about to change. This repository here holds the power to rid them all (well not exactly lol). If you're like me, you don't have the time to go through all 100+ projects and manually remove every AE studio that rears its ugly head, you want to get rid of them now. This project aims to achieve that.
 
-Utilizing jQuery AJAX, all it takes is for you to provide your Scratch username, and let the program find the AE studios for you. Once it's done searching, it gives you some code and instructions on how to use it. Because Scratch block CORS, the only option I can provide for now is code you must run while on a Scratch webpage.
+Utilizing jQuery AJAX, all it takes is for you to provide your Scratch username, and let the program find the AE studios for you. Once it's done searching, it gives you some code and instructions on how to use it. Because Scratch blocks CORS (Cross-Origin Resource Sharing), the only option I can provide for now is code you must run while on a Scratch webpage.
 
+As of the most recent version, to removes studios, you must run some generated code in your browser's console. Don't know what that is? [Look here](http://lmgtfy.com/?q=how+to+access+the+browser+console).
 As usual, some of the code is fairly noobish and there are lots of exceptions to catch and handle. I can't always guarantee that every AE studio will be removed as some have misspelt names and intentional workarounds in their names. If you find an AE studio that didn't get caught by the filter, please let me know by email or google+.
 
 Lovely regards to the fair people of the Internet,
