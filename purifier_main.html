@@ -64,7 +64,9 @@ function checkUser(u) {
 
 function getCustomRegExp() {
 	try {
-		extras = new RegExp($("#extra-regex")[0].value,'gi');
+		extras = $("#extra-regex")[0].value;
+		if (extras) extras = new RegExp(extras,'gi');
+		else extras = "";
 	} catch (e) {
 		console.log("Not a valid regex. " + e);
 		extras = "";
@@ -102,8 +104,10 @@ function loadStudios(p) {
             for (var s = 0; s < $studios.length; s++) {
                 var name = $studios[s].text.trim();
                 var id = $studios[s].pathname.match(/\d+/)[0];
-                if (AE.test(name) && !notAE.test(name)) $s.push(id);
-                else if (extras && extras.test(name)) $s.push(id);
+                if (!notAE.test(name)) {
+                	if (AE.test(name)) $s.push(id);
+                	else if (extras && extras.test(name)) $s.push(id);
+                }
                 
             }
             if ($s.length) _d.push({p: p,s: $s});
