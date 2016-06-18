@@ -1,6 +1,7 @@
 # scratch-ae-purifier
 Easy removal of AE studios on all your Scratch projects
 
+NOTE: This project has been moved to my website at https://zro617.github.io/projects/purity.html
 
 One of the most common nuisances on Scratch are these studios that try to gobble up every project. We do our best to get rid of them, but they persist like a bad itch. Worst of all, we can't do much against them because they don't break the rules yet.
 
